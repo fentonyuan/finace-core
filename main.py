@@ -58,7 +58,7 @@ def refresh_daily_trade_data(network:Network, start:str, end:str):
     for stock in stocks:    
         if stock.name.startswith("*"):
             continue
-        trades = pull_daily_trade_from_tushare(network, [stock], start_date, end_date)
+        trades = pull_daily_trade_from_tushare(network, [stock], start, end)
         
         data = []
         dates = []
@@ -70,16 +70,36 @@ def refresh_daily_trade_data(network:Network, start:str, end:str):
         save_daily_trade_date(pd_data, stock.name)
 
 
-config = json.load(open("./config.json"))
-start_date = "20220101"
-end_date = "20220930"
 
-network = Network(config["url"], config["token"])
-refresh_daily_trade_data(network, start_date, end_date)
 
+#依据csv数据生成各项量化指标
+def analyze_daily_trade():
+    path = "../data"
+    stock_folder_list = os.listdir(path)
+    for stock_folder in stock_folder_list:
+        folder_path = os.path.join(path, stock_folder)
+        csv_path = os.path.join(folder_path, stock_folder + ".csv")
+        data = pd.read_csv(csv_path)
+        
+        #生成价格变化图
+        ts =pd.Series(data["close"].to_numpy(), index=data.index)
+        ts.plot()
+        plt.savefig(os.path.join(folder_path, stock_folder + ".png"))
+        plt.close()
+        
+        #生成其他技术指标
+
+
+#config = json.load(open("./config.json"))
+#start_date = "20220101"
+#end_date = "20220930"
+
+#network = Network(config["url"], config["token"])
+#refresh_daily_trade_data(network, start_date, end_date)
+analyze_daily_trade()
 
 '''
-data = pd.read_csv("data/张家界.csv")
+
 
 ts =pd.Series(data["close"].to_numpy(), index=data.index)
 ts.plot()
