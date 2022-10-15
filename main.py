@@ -13,6 +13,7 @@ from datetime import datetime
 import talib 
 import json
 import os
+import sys
 
 #获取股票列表
 def pull_stock_from_tushare(network:Network, max:int):
@@ -89,14 +90,28 @@ def analyze_daily_trade():
         
         #生成其他技术指标
 
+def refresh_command():
+    config = json.load(open("./config.json"))
+    start_date = "20220101"
+    end_date = "20220930"
+    network = Network(config["url"], config["token"])
+    refresh_daily_trade_data(network, start_date, end_date)
 
-#config = json.load(open("./config.json"))
-#start_date = "20220101"
-#end_date = "20220930"
+def analyze_command():
+    analyze_daily_trade()
 
-#network = Network(config["url"], config["token"])
-#refresh_daily_trade_data(network, start_date, end_date)
-analyze_daily_trade()
+if len(sys.argv) > 1:
+    for i in range(1, len(sys.argv)):        
+        command = sys.argv[i]
+        print(str(i) + "st input command:" + command)
+        if command == "refresh":
+            print("refresh")
+        elif command == "analyze":
+            print("analyze")
+        else:
+            print("unknown command")
+else:
+    print("please input command")
 
 '''
 
