@@ -10,10 +10,10 @@ import math
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import talib 
 import json
 import os
 import sys
+import analyze
 
 #获取股票列表
 def pull_stock_from_tushare(network:Network, max:int):
@@ -73,22 +73,7 @@ def refresh_daily_trade_data(network:Network, start:str, end:str):
 
 
 
-#依据csv数据生成各项量化指标
-def analyze_daily_trade():
-    path = "../data"
-    stock_folder_list = os.listdir(path)
-    for stock_folder in stock_folder_list:
-        folder_path = os.path.join(path, stock_folder)
-        csv_path = os.path.join(folder_path, stock_folder + ".csv")
-        data = pd.read_csv(csv_path)
-        
-        #生成价格变化图
-        ts =pd.Series(data["close"].to_numpy(), index=data.index)
-        ts.plot()
-        plt.savefig(os.path.join(folder_path, stock_folder + ".png"))
-        plt.close()
-        
-        #生成其他技术指标
+
 
 def refresh_command():
     config = json.load(open("./config.json"))
@@ -98,16 +83,16 @@ def refresh_command():
     refresh_daily_trade_data(network, start_date, end_date)
 
 def analyze_command():
-    analyze_daily_trade()
+    analyze.Analyzer("../data").analyze_daily_trade()
 
 if len(sys.argv) > 1:
     for i in range(1, len(sys.argv)):        
         command = sys.argv[i]
         print(str(i) + "st input command:" + command)
         if command == "refresh":
-            print("refresh")
+            refresh_command()
         elif command == "analyze":
-            print("analyze")
+            analyze_command()
         else:
             print("unknown command")
 else:
